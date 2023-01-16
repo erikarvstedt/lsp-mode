@@ -136,7 +136,7 @@ is an hints in symbols range."
 (defvar lsp-headerline-arrow nil
   "Holds the current breadcrumb string on headerline.")
 
-(defvar-local lsp-headerline--path-up-to-project-segments nil
+(defvar-local lsp-headerline--path-up-to-project-segments 'unitialized
   "Holds the current breadcrumb path-up-to-project segments for
 caching purposes.")
 
@@ -305,12 +305,12 @@ PATH is the current folder to be checked."
 (defun lsp-headerline--build-path-up-to-project-string ()
   "Build the path-up-to-project segment for the breadcrumb."
   (if-let ((root (lsp-headerline--workspace-root)))
-      (let ((segments (or
-                       lsp-headerline--path-up-to-project-segments
-                       (setq lsp-headerline--path-up-to-project-segments
-                             (lsp-headerline--path-up-to-project-root
-                              root
-                              (lsp-f-parent (buffer-file-name)))))))
+      (let ((segments (if (eq lsp-headerline--path-up-to-project-segments 'unitialized)
+                          (setq lsp-headerline--path-up-to-project-segments
+                                (lsp-headerline--path-up-to-project-root
+                                 root
+                                 (lsp-f-parent (buffer-file-name))))
+                        lsp-headerline--path-up-to-project-segments)))
         (mapconcat (lambda (next-dir)
                      (propertize next-dir
                                  'font-lock-face
